@@ -1,20 +1,41 @@
 <template>
-  <div class="hello">
-    <h1> Register </h1>
-    <input
-            type="email"
-            name="email"
-            v-model="email"
-            placeholder="email"/>
-    <br/>
-    <input
-            type="password"
-            name="password"
-            v-model="password"
-            placeholder="password"/>
-    <br/>
-    <button type="submit" @click="register"> Register</button>
-  </div>
+  <v-layout column>
+    <v-flex xs4 offset-xs4>
+      <v-card dark class="grey lighten-2">
+        <v-toolbar flat dense class="primary" dark>
+          <v-toolbaar-title class="white--text"><h6 class="mb-0"> Register </h6> </v-toolbaar-title>
+        </v-toolbar>
+        <div class="pl-5 pr-5 pb-4">
+          <v-text-field
+                  type="email"
+                  name="email"
+                  label="Email"
+                  id="email"
+                  v-model="email"
+                  required
+          ></v-text-field>
+          <v-text-field
+                  type="password"
+                  name="password"
+                  label="Password"
+                  id="password"
+                  v-model="password"
+                  required
+          ></v-text-field>
+
+
+          <v-alert v-if="error" v-html="error" error value="true">
+          </v-alert>
+
+          <v-btn
+                  success
+                  dark
+                  type="submit" @click="register"> Register</v-btn>
+        </div>
+      </v-card>
+    </v-flex>
+  </v-layout>
+
 </template>
 
 <script>
@@ -24,31 +45,35 @@
     data () {
       return {
         email: '',
-        password: ''
+        password: '',
+        error: null
       }
     },
-   /* watch: {
-      email (value) {
-        console.log('email has changed', value)
-      }
 
-    }, */
+    /* watch: {
+     email (value) {
+     console.log('email has changed', value)
+     }
+
+     }, */
     methods: {
       async register () {
-        const response = await AuthenticationService.register({
-          email: this.email,
-          password: this.password
-        })
-        console.log(response.data)
+        try {
+          const response = await AuthenticationService.register({
+            email: this.email,
+            password: this.password
+          })
+          this.$store.dispatch('setToken', response.data.token)
+          this.$store.dispatch('setUser', response.data.user)
+        } catch (err) {
+          this.error = err.response.data.error
+        }
       }
-    }
-    /* mounted () {
-      setTimeout(() => {
-        this.email = 'hello world'
-      }, 2000)
-    } */
 
+    }
   }
 
 </script>
+<style scoped>
 
+</style>
